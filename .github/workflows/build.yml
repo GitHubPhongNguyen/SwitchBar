@@ -1,0 +1,23 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build
+        run: ./build.sh dist
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: SwitchBar
+          path: build/SwitchBar-*.zip
+          retention-days: 14

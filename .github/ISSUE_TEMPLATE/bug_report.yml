@@ -1,0 +1,50 @@
+name: Bug report / Báo lỗi
+description: Something doesn't work as expected. / Có gì đó không chạy đúng.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened? / Chuyện gì xảy ra?
+      description: What you clicked, what you expected and what you saw instead. Screenshots help.
+    validations:
+      required: true
+  - type: input
+    id: switchbar-version
+    attributes:
+      label: SwitchBar version / Phiên bản SwitchBar
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version / Phiên bản macOS
+      description: Apple menu → About This Mac
+      placeholder: "macOS 15.4"
+    validations:
+      required: true
+  - type: dropdown
+    id: chip
+    attributes:
+      label: Mac chip
+      options:
+        - Apple silicon (M1, M2, M3…)
+        - Intel
+    validations:
+      required: true
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which tool? / Công cụ nào?
+      options:
+        - Network priority / Ưu tiên mạng
+        - Scroll direction / Hướng cuộn
+        - Settings, shortcut or open at login / Cài đặt, phím tắt, mở cùng máy
+        - Installing / Cài đặt app
+  - type: textarea
+    id: network-order
+    attributes:
+      label: Network service order (network problems only) / Thứ tự mạng (chỉ khi lỗi mạng)
+      description: Output of `networksetup -listnetworkserviceorder` in Terminal.
+      render: text

@@ -1,0 +1,63 @@
+name: Release
+
+# Pushing a tag such as v1.0.0 builds the app and publishes it as a GitHub release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check the tag matches Info.plist
+        run: |
+          VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Info.plist)
+          if [[ "$GITHUB_REF_NAME" != "v$VERSION" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match CFBundleShortVersionString $VERSION in Info.plist"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: ./build.sh dist
+
+      - name: Checksum
+        working-directory: build
+        run: shasum -a 256 "SwitchBar-$VERSION.zip" > "SwitchBar-$VERSION.zip.sha256"
+
+      - name: Write release notes
+        run: |
+          # The CHANGELOG section for this version, without its heading.
+          awk -v v="$VERSION" '/^## \[/ { p = index($0, "[" v "]") > 0; next } p' CHANGELOG.md > notes.md
+          if [[ ! -s notes.md ]]; then
+            echo "::error::CHANGELOG.md has no section for $VERSION"
+            exit 1
+          fi
+          cat >> notes.md <<'EOF'
+
+          ---
+
+          ### Install / Cài đặt
+
+          1. Download `SwitchBar-*.zip` below, unzip it and drag **SwitchBar.app** into **Applications**.
+             Tải file `.zip` bên dưới, giải nén rồi kéo **SwitchBar.app** vào **Applications**.
+          2. The app isn't notarized by Apple, so the first launch is blocked: click **Done**, then **System Settings → Privacy & Security → Open Anyway**.
+             App chưa được Apple công chứng nên lần đầu sẽ bị chặn: bấm **Xong**, rồi vào **System Settings → Privacy & Security → Open Anyway**.
+
+          See the [README](https://github.com/${{ github.repository }}#install) for details · Xem [README tiếng Việt](https://github.com/${{ github.repository }}/blob/main/README.vi.md#cài-đặt)
+          EOF
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "build/SwitchBar-$VERSION.zip" \
+            "build/SwitchBar-$VERSION.zip.sha256" \
+            --title "SwitchBar $VERSION" \
+            --notes-file notes.md

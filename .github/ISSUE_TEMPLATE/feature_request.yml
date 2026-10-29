@@ -1,0 +1,15 @@
+name: Feature request / Đề xuất tính năng
+description: An idea for a new switch or an improvement. / Ý tưởng công tắc mới hoặc cải tiến.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would you like to switch faster? / Bạn muốn đổi nhanh cài đặt nào?
+      description: Describe the setting and how you change it today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How should it work? / Bạn muốn nó hoạt động thế nào?
